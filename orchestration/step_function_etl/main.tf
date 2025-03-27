@@ -33,6 +33,14 @@ resource "aws_sfn_state_machine" "this" {
         Parameters = {
           Name = var.crawler_name
         },
+        Retry = [
+          {
+            ErrorEquals     = ["Glue.CrawlerRunningException"],
+            IntervalSeconds = 60,
+            MaxAttempts     = 5,
+            BackoffRate     = 2.0
+          }
+        ],
         Next = "WaitForCrawler"
       },
 

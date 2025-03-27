@@ -69,6 +69,7 @@ module "glue_crawler" {
   database_name  = module.glue_database.name
   s3_target_path = "s3://${module.s3_bucket.bucket_name}/processed/"
   schedule       = null
+  depends_on = [module.s3_bucket]  # ✅ Ensures prefix exists before crawler creation
 }
 
 output "glue_crawler_name" {
