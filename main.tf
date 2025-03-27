@@ -69,7 +69,7 @@ module "glue_crawler" {
   database_name  = module.glue_database.name
   s3_target_path = "s3://${module.s3_bucket.bucket_name}/processed/"
   schedule       = null
-  depends_on = [module.s3_bucket]  # ✅ Ensures prefix exists before crawler creation
+  depends_on     = [module.s3_bucket] # ✅ Ensures prefix exists before crawler creation
 }
 
 output "glue_crawler_name" {
@@ -110,4 +110,16 @@ module "step_function_etl" {
 
 output "crawler_name" {
   value = module.step_function_etl.crawler_name
+}
+
+#####################################
+# Monitoring Layer (monitoring/)
+#####################################
+
+module "monitoring" {
+  source             = "./monitoring"
+  lambda_name        = module.lambda_trigger_step_function_etl.lambda_name
+  step_function_name = module.step_function_etl.name
+  step_function_arn  = module.step_function_etl.state_machine_arn
+  glue_job_name      = module.glue_job.job_name
 }

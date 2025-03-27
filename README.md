@@ -1,8 +1,40 @@
-# AWS Data DevOps 001
+# AWS Data DevOps Project
 
-This project automates a serverless ETL pipeline using AWS and Terraform. It is structured to reflect a real DevOps-style layout with modular infrastructure, ETL logic, and orchestration.
+## 🚀 What This Project Demonstrates
 
----
+This project is ideal for Data Engineers and DevOps professionals who want to:
+
+- Automate all data infrastructure with Terraform
+- Build an event-driven ETL pipeline (S3 → Lambda → Step Function → Glue)
+- Ensure data is queryable in Athena using a structured data lake
+- Follow best practices for modular infrastructure-as-code (IaC)
+
+
+This project implements a serverless data pipeline on AWS using Terraform, Glue, Lambda, and Step Functions.
+
+## 🔁 Full Automation with Terraform
+
+This project provisions a complete data pipeline using **Terraform only**.
+
+When you run:
+
+```bash
+terraform init
+terraform apply
+```
+
+Terraform automatically creates:
+
+- ✅ An S3 bucket with `raw/`, `processed/`, and `scripts/` prefixes  
+- ✅ A Glue database  
+- ✅ A Glue crawler for `processed/`  
+- ✅ A Glue ETL job (converts CSV to Parquet)  
+- ✅ A Lambda function that starts the Step Function  
+- ✅ A Step Function to orchestrate the ETL + crawler  
+- ✅ An EventBridge rule that triggers on S3 upload
+
+> No manual setup required — all resources are created and wired automatically.
+
 
 ## Folder Structure
 
@@ -11,6 +43,7 @@ aws-data-devops-001/
 ├── infra/              # Core infrastructure (IAM, S3, EventBridge, Lambda)
 ├── etl/                # ETL components (Glue job, crawler, database)
 ├── orchestration/      # Step Function to orchestrate the ETL pipeline
+├── monitoring/         # Monitoring with CloudWatch Alarms
 ├── scripts/            # Python scripts for the ETL job
 ├── main.tf             # Root Terraform configuration to wire modules together
 ├── versions.tf         # Provider and Terraform versions
@@ -41,22 +74,71 @@ aws-data-devops-001/
 
 ## Flow Summary
 
-1. CSV uploaded to `s3://my-data-lake-demo-bucket/raw/`
-2. EventBridge triggers a Lambda
-3. Lambda starts a Step Function
-4. Step Function runs the Glue job
-5. Step Function waits
-6. Step Function starts the crawler
-7. Processed Parquet files become queryable in Athena
+1. A CSV file is uploaded to `s3://my-data-lake-demo-bucket/raw/`
+2. EventBridge detects the upload and triggers a Lambda function
+3. The Lambda function starts an execution of a Step Function (designed to safely handle concurrent executions if multiple CSVs are uploaded)
+4. The Step Function launches a Glue ETL job (which converts the CSV to Parquet in `s3://my-data-lake-demo-bucket/processed/`)
+5. The Step Function waits until the job completes
+6. Once the job is done, the Step Function starts a Glue Crawler
+7. The Crawler updates the Glue Data Catalog with the new Parquet schema
+8. The resulting data in `processed/` becomes queryable in Athena
+
+![Flow Diagram](./docs/etl-flow-diagram.png)
 
 ---
 
-## Future Ideas
 
-- Add S3 object versioning
-- Add CloudWatch alerts for failed jobs
-- Add CI/CD pipeline to deploy this with GitHub Actions or CodePipeline
-- Tagging strategy for cost tracking
+## 🔍 Athena Queries
+
+Once the ETL pipeline runs successfully, your transformed Parquet data is queryable in **Amazon Athena**.
+
+### 🧪 Example Queries
+
+**Preview the `customers` table:**
+```sql
+SELECT * FROM "data_lake_db"."customers" LIMIT 10;
+```
+
+**Join `customers` and `orders`:**
+```sql
+SELECT 
+  c.customer_id, 
+  c.name, 
+  o.order_id, 
+  o.amount
+FROM 
+  "data_lake_db"."customers" c
+JOIN 
+  "data_lake_db"."orders" o 
+ON 
+  c.customer_id = o.customer_id
+LIMIT 10;
+```
+
+You can find these queries in the [`athena/`](./athena) folder.
+
+---
+
+## 📈 Monitoring (CloudWatch)
+
+This project includes monitoring and alerting for key components of the data pipeline using **Amazon CloudWatch**.
+
+### ✅ What's Monitored
+
+- **Glue Job Failures**
+  - Alarm: Triggers if any Glue job fails (`FailedJobs > 0`)
+- **Step Function Failures**
+  - Alarm: Triggers if any Step Function execution fails (`ExecutionsFailed > 0`)
+- **Lambda Function Errors**
+  - Alarm: Triggers if the Lambda function encounters errors (`Errors > 0`)
+
+### 🔔 How It Works
+
+- CloudWatch Alarms are created via Terraform in the `monitoring/` module.
+- All alarms use a 5-minute evaluation window.
+- You can view them in the CloudWatch console under:
+  - Alarms → All Alarms
+  - Or directly from the “Overview” dashboard
 
 ---
 
@@ -74,9 +156,3 @@ aws-data-devops-001/
 terraform init
 terraform apply -auto-approve
 ```
-
----
-
-## Authors
-
-- Antonio-LGGF

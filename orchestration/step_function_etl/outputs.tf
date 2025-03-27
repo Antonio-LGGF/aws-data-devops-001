@@ -17,3 +17,8 @@ output "s3_target_path_base" {
 output "crawler_name" {
   value = var.crawler_name
 }
+
+output "name" {
+  value = aws_sfn_state_machine.this.name
+}
+
