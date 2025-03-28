@@ -1,13 +1,10 @@
-﻿name: Terraform CI/CD
+name: Terraform Destroy
 
 on:
-  push:
-    branches:
-      - main
-  workflow_dispatch: # Allows you to manually trigger the destroy job
+  workflow_dispatch: # Allows manual trigger from GitHub UI
 
 jobs:
-  terraform:
+  destroy:
     runs-on: ubuntu-latest
 
     steps:
@@ -29,13 +26,5 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
-      - name: Terraform Validate
-        run: terraform validate
-
-      - name: Terraform Plan
-        run: terraform plan -out=tfplan
-
-      - name: Terraform Apply
-        run: terraform apply -auto-approve tfplan
-
-
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve
