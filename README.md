@@ -6,7 +6,7 @@ Sure! Here's a polished version with a professional tone:
 
 ## 🚀 Serverless Data Pipeline on AWS
 
-This project showcases a fully automated, event-driven ETL pipeline built with AWS services and Terraform. It highlights key DataOps and DevOps principles:
+This project showcases a fully automated, event-driven ETL pipeline built with AWS services and Terraform. It highlights key DataOps and DevOps principles :
 
 - ✅ Infrastructure provisioned entirely with **Terraform**
 - ✅ Event-driven flow: **S3 → Lambda → Step Functions → Glue**
