@@ -1,6 +1,8 @@
 # Reference existing log group created automatically by Lambda
 data "aws_cloudwatch_log_group" "lambda_logs" {
   name = "/aws/lambda/trigger-step-function-etl"
+  tags = var.tags
+
 }
 
 # Alarm for Lambda function errors
@@ -14,6 +16,7 @@ resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
   statistic           = "Sum"
   threshold           = 0
   alarm_description   = "Alarm when Lambda function has errors"
+  tags                = var.tags
   dimensions = {
     FunctionName = var.lambda_name
   }
@@ -30,6 +33,7 @@ resource "aws_cloudwatch_metric_alarm" "stepfunction_failures" {
   statistic           = "Sum"
   threshold           = 0
   alarm_description   = "Alarm when Step Function executions fail"
+  tags                = var.tags
   dimensions = {
     StateMachineArn = var.step_function_arn
   }
@@ -46,6 +50,7 @@ resource "aws_cloudwatch_metric_alarm" "glue_job_failures" {
   statistic           = "Sum"
   threshold           = 0
   alarm_description   = "Alarm when Glue job fails"
+  tags                = var.tags
   dimensions = {
     JobName = var.glue_job_name
   }

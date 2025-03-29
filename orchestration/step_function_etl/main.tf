@@ -1,6 +1,7 @@
 resource "aws_sfn_state_machine" "this" {
   name     = var.name
   role_arn = var.role_arn
+  tags     = var.tags
 
   definition = jsonencode({
     StartAt = "StartGlueJob",
@@ -11,7 +12,7 @@ resource "aws_sfn_state_machine" "this" {
         Parameters = {
           JobName = var.glue_job_name,
           Arguments = {
-            "--JOB_NAME"                 = var.glue_job_name,
+            "--JOB_NAME"                = var.glue_job_name,
             "--SPECIFIC_S3_FILE_PATH.$" = "States.Format('s3://{}/{}', $.bucket, $.key)",
             "--S3_TARGET_PATH_BASE"     = var.s3_target_path_base
           }
@@ -51,8 +52,8 @@ resource "aws_sfn_state_machine" "this" {
       },
 
       CheckCrawlerStatus = {
-        Type       = "Task",
-        Resource   = "arn:aws:states:::aws-sdk:glue:getCrawler",
+        Type     = "Task",
+        Resource = "arn:aws:states:::aws-sdk:glue:getCrawler",
         Parameters = {
           Name = var.crawler_name
         },

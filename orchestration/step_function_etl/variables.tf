@@ -7,3 +7,7 @@ variable "s3_target_path_base" {
   type = string
 }
 
+variable "tags" {
+  type    = map(string)
+  default = null
+}

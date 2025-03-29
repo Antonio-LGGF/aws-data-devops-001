@@ -1,6 +1,10 @@
 resource "aws_glue_job" "this" {
   name     = var.job_name
   role_arn = var.iam_role_arn
+  tags     = var.tags
+
+
+
 
   command {
     name            = "glueetl"
@@ -9,5 +13,5 @@ resource "aws_glue_job" "this" {
   }
 
   glue_version = "4.0"
-  max_capacity = 2.0  # 2 DPU
+  max_capacity = 2.0 # 2 DPU
 }

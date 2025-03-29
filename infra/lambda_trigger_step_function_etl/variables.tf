@@ -17,3 +17,8 @@ variable "lambda_execution_role_arn" {
   description = "IAM Role ARN for Lambda to assume"
   type        = string
 }
+
+variable "tags" {
+  type    = map(string)
+  default = null
+}

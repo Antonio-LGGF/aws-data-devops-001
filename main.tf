@@ -9,6 +9,7 @@ provider "aws" {
 module "s3_bucket" {
   source      = "./infra/s3_bucket"
   bucket_name = local.s3_bucket_name
+  tags        = local.tags
 }
 
 output "bucket_name" {
@@ -30,6 +31,7 @@ module "lambda_trigger_step_function_etl" {
   state_machine_arn         = module.step_function_etl.state_machine_arn
   lambda_zip_file           = "./infra/lambda_trigger_step_function_etl/lambda_trigger_step_function_etl.zip"
   lambda_execution_role_arn = module.step_function_etl.role_arn
+  tags                      = local.tags
 }
 
 output "lambda_name" {
@@ -46,6 +48,7 @@ module "eventbridge_trigger" {
   bucket_name = module.s3_bucket.bucket_name
   lambda_name = module.lambda_trigger_step_function_etl.lambda_name
   lambda_arn  = module.lambda_trigger_step_function_etl.lambda_arn
+  tags        = local.tags
 }
 
 #####################################
@@ -55,6 +58,7 @@ module "eventbridge_trigger" {
 module "glue_database" {
   source        = "./etl/glue_database"
   database_name = local.glue_database_name
+  tags          = local.tags
 }
 
 output "glue_database_name" {
@@ -69,6 +73,7 @@ module "glue_crawler" {
   s3_target_path = local.s3_processed_path
   schedule       = null
   depends_on     = [module.s3_bucket] # Ensures prefix exists before crawler creation
+  tags           = local.tags
 }
 
 output "glue_crawler_name" {
@@ -80,6 +85,7 @@ resource "aws_s3_object" "glue_script" {
   key    = "scripts/process_raw_to_parquet.py"
   source = "${path.module}/scripts/process_raw_to_parquet.py"
   etag   = filemd5("${path.module}/scripts/process_raw_to_parquet.py")
+  tags   = local.tags
 }
 
 module "glue_job" {
@@ -87,6 +93,7 @@ module "glue_job" {
   job_name        = local.glue_job_name
   iam_role_arn    = module.glue_iam_role.arn
   script_location = "s3://${module.s3_bucket.bucket_name}/scripts/process_raw_to_parquet.py"
+  tags            = local.tags
 }
 
 output "glue_job_name" {
@@ -104,6 +111,7 @@ module "step_function_etl" {
   glue_job_name       = module.glue_job.job_name
   role_arn            = module.step_function_etl.role_arn
   s3_target_path_base = local.s3_processed_path
+  tags                = local.tags
 }
 
 output "crawler_name" {
@@ -120,4 +128,5 @@ module "monitoring" {
   step_function_name = module.step_function_etl.name
   step_function_arn  = module.step_function_etl.state_machine_arn
   glue_job_name      = module.glue_job.job_name
+  tags               = local.tags
 }

@@ -2,17 +2,18 @@
 resource "aws_cloudwatch_event_rule" "s3_event_to_lambda" {
   name        = var.rule_name
   description = "Trigger Lambda when a file is uploaded under raw/"
+  tags        = var.tags
 
   event_pattern = jsonencode({
-    "source": ["aws.s3"],
-    "detail-type": ["Object Created"],
-    "detail": {
-      "bucket": {
-        "name": [var.bucket_name]
+    "source" : ["aws.s3"],
+    "detail-type" : ["Object Created"],
+    "detail" : {
+      "bucket" : {
+        "name" : [var.bucket_name]
       },
-      "object": {
-        "key": [{
-          "prefix": "raw/"
+      "object" : {
+        "key" : [{
+          "prefix" : "raw/"
         }]
       }
     }

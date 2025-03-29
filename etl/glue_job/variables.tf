@@ -9,3 +9,8 @@ variable "iam_role_arn" {
 variable "script_location" {
   type = string
 }
+
+variable "tags" {
+  type    = map(string)
+  default = null
+}

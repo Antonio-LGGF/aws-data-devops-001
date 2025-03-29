@@ -47,8 +47,8 @@ resource "aws_iam_role_policy" "allow_start_stepfunction" {
     Version = "2012-10-17",
     Statement = [
       {
-        Effect = "Allow",
-        Action = "states:StartExecution",
+        Effect   = "Allow",
+        Action   = "states:StartExecution",
         Resource = aws_sfn_state_machine.this.arn
       }
     ]

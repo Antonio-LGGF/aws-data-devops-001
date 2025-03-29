@@ -1,17 +1,16 @@
-Sure! Here's a polished version with a professional tone:
+# AWS DevOps Serverless Data Pipeline Project
 
----
+This project demonstrates a fully automated, event-driven ETL pipeline built with AWS and Terraform. It highlights core **DataOps** and **DevOps** principles by combining infrastructure automation, orchestration, and monitoring.
 
-# AWS Data DevOps Project
+### 🚀 Key Features
 
-## 🚀 Serverless Data Pipeline on AWS
-
-This project showcases a fully automated, event-driven ETL pipeline built with AWS services and Terraform. It highlights key DataOps and DevOps principles :
-
-- ✅ Infrastructure provisioned entirely with **Terraform**
-- ✅ Event-driven flow: **S3 → Lambda → Step Functions → Glue**
-- ✅ Outputs Parquet files for efficient querying via **Athena**
-- ✅ Modular, reusable **Infrastructure as Code (IaC)** structure following best practices
+- ✅ **100% Infrastructure as Code (IaC)** using Terraform
+- ✅ **Event-driven architecture**: S3 → Lambda → Step Functions → Glue
+- ✅ **PySpark ETL**: CSV files are converted to Parquet format
+- ✅ **Athena-ready**: Query transformed data using the Glue Data Catalog
+- ✅ **Reusable modular design**: Clean separation between infrastructure, ETL, and orchestration
+- ✅ **Cloud-native monitoring**: CloudWatch alarms for Glue, Lambda, and Step Functions
+- ✅ **Centralized tagging**: Consistent tagging for cost tracking and resource visibility
 
 ---
 
@@ -50,6 +49,7 @@ aws-data-devops-001/
 ├── scripts/            # Python scripts for the ETL job
 ├── main.tf             # Root Terraform configuration to wire modules together
 ├── versions.tf         # Provider and Terraform versions
+├── locals.tf           # Defines shared variables for consistent naming and configuration.
 ```
 
 ---
@@ -142,6 +142,29 @@ This project includes monitoring and alerting for key components of the data pip
 - You can view them in the CloudWatch console under:
   - Alarms → All Alarms
   - Or directly from the “Overview” dashboard
+
+---
+
+## 🏷 Resource Tagging
+
+All AWS resources provisioned by this project are consistently tagged using a common tag set. These tags help with:
+
+- 💰 **Cost allocation**
+- 🛡️ **Security auditing**
+- 📊 **Resource tracking**
+- 📁 **Environment and ownership classification**
+
+### ✅ Default Tags Applied
+
+```hcl
+Environment = "dev"
+Team        = "DataEngineering"
+Project     = "aws-data-devops-001"
+Owner       = "Antonio"
+```
+
+You can view these tags in the AWS Console on each resource page under the **Tags** tab.  
+They are defined centrally in `locals.tf` and passed to all modules using `var.tags`.
 
 ---
 
