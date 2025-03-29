@@ -36,10 +36,10 @@ resource "aws_iam_role_policy" "s3_access" {
           "s3:PutObject"
         ],
         Resource = [
-          "arn:aws:s3:::my-data-lake-demo-bucket",
-          "arn:aws:s3:::my-data-lake-demo-bucket/raw/*",
-          "arn:aws:s3:::my-data-lake-demo-bucket/scripts/*",
-          "arn:aws:s3:::my-data-lake-demo-bucket/processed/*"
+          "arn:aws:s3:::${var.bucket_name}",
+          "arn:aws:s3:::${var.bucket_name}/raw/*",
+          "arn:aws:s3:::${var.bucket_name}/scripts/*",
+          "arn:aws:s3:::${var.bucket_name}/processed/*"
         ]
       }
     ]

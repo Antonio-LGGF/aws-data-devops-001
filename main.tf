@@ -17,8 +17,9 @@ output "bucket_name" {
 }
 
 module "glue_iam_role" {
-  source    = "./infra/glue_iam_role"
-  role_name = local.glue_iam_role_name
+  source      = "./infra/glue_iam_role"
+  role_name   = local.glue_iam_role_name
+  bucket_name = module.s3_bucket.bucket_name
 }
 
 output "glue_iam_role_arn" {
