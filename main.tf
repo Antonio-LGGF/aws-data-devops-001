@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "us-east-1"
+  region = local.aws_region
 }
 
 #####################################
@@ -8,7 +8,7 @@ provider "aws" {
 
 module "s3_bucket" {
   source      = "./infra/s3_bucket"
-  bucket_name = "my-data-lake-demo-bucket"
+  bucket_name = local.s3_bucket_name
 }
 
 output "bucket_name" {
@@ -17,7 +17,7 @@ output "bucket_name" {
 
 module "glue_iam_role" {
   source    = "./infra/glue_iam_role"
-  role_name = "glue-crawler-role"
+  role_name = local.glue_iam_role_name
 }
 
 output "glue_iam_role_arn" {
@@ -26,7 +26,7 @@ output "glue_iam_role_arn" {
 
 module "lambda_trigger_step_function_etl" {
   source                    = "./infra/lambda_trigger_step_function_etl"
-  lambda_name               = "trigger-step-function-etl"
+  lambda_name               = local.lambda_name
   state_machine_arn         = module.step_function_etl.state_machine_arn
   lambda_zip_file           = "./infra/lambda_trigger_step_function_etl/lambda_trigger_step_function_etl.zip"
   lambda_execution_role_arn = module.step_function_etl.role_arn
@@ -42,12 +42,11 @@ output "lambda_arn" {
 
 module "eventbridge_trigger" {
   source      = "./infra/eventbridge_s3_to_lambda"
-  rule_name   = "trigger-lambda-on-upload"
+  rule_name   = local.eventbridge_rule_name
   bucket_name = module.s3_bucket.bucket_name
   lambda_name = module.lambda_trigger_step_function_etl.lambda_name
   lambda_arn  = module.lambda_trigger_step_function_etl.lambda_arn
 }
-
 
 #####################################
 # ETL Layer (etl/)
@@ -55,7 +54,7 @@ module "eventbridge_trigger" {
 
 module "glue_database" {
   source        = "./etl/glue_database"
-  database_name = "data_lake_db"
+  database_name = local.glue_database_name
 }
 
 output "glue_database_name" {
@@ -64,12 +63,12 @@ output "glue_database_name" {
 
 module "glue_crawler" {
   source         = "./etl/glue_crawler"
-  crawler_name   = "processed-data-crawler"
+  crawler_name   = local.glue_crawler_name
   iam_role_arn   = module.glue_iam_role.arn
   database_name  = module.glue_database.name
-  s3_target_path = "s3://${module.s3_bucket.bucket_name}/processed/"
+  s3_target_path = local.s3_processed_path
   schedule       = null
-  depends_on     = [module.s3_bucket] # ✅ Ensures prefix exists before crawler creation
+  depends_on     = [module.s3_bucket] # Ensures prefix exists before crawler creation
 }
 
 output "glue_crawler_name" {
@@ -85,7 +84,7 @@ resource "aws_s3_object" "glue_script" {
 
 module "glue_job" {
   source          = "./etl/glue_job"
-  job_name        = "process-raw-to-parquet"
+  job_name        = local.glue_job_name
   iam_role_arn    = module.glue_iam_role.arn
   script_location = "s3://${module.s3_bucket.bucket_name}/scripts/process_raw_to_parquet.py"
 }
@@ -94,18 +93,17 @@ output "glue_job_name" {
   value = module.glue_job.job_name
 }
 
-
 #####################################
 # Orchestration Layer (orchestration/)
 #####################################
 
 module "step_function_etl" {
   source              = "./orchestration/step_function_etl"
-  name                = "etl-orchestration"
+  name                = local.step_function_name
   crawler_name        = module.glue_crawler.crawler_name
   glue_job_name       = module.glue_job.job_name
   role_arn            = module.step_function_etl.role_arn
-  s3_target_path_base = "s3://${module.s3_bucket.bucket_name}/processed/"
+  s3_target_path_base = local.s3_processed_path
 }
 
 output "crawler_name" {
