@@ -1,6 +1,7 @@
 # AWS DevOps Serverless Data Pipeline Project
 
-This project demonstrates a fully automated, event-driven ETL pipeline built with AWS and Terraform. It highlights core **DataOps** and **DevOps** principles by combining infrastructure automation, orchestration, and monitoring.
+This project demonstrates a fully automated, event-driven ETL pipeline built with AWS and Terraform. 
+It highlights core **DataOps** and **DevOps** principles by combining infrastructure automation, orchestration, and monitoring.
 
 ### 🚀 Key Features
 
