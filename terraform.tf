@@ -5,6 +5,6 @@ terraform {
     workspaces {
       name = "aws-data-devops-001"
     }
-    
+
   }
 }
