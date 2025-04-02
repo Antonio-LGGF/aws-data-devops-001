@@ -38,19 +38,38 @@ Terraform automatically creates:
 
 > No manual setup required — all resources are created and wired automatically.
 
-
-## Folder Structure
-
+---
+## 📂 Project Structure
 ```
-aws-data-devops-001/
-├── infra/              # Core infrastructure (IAM, S3, EventBridge, Lambda)
-├── etl/                # ETL components (Glue job, crawler, database)
-├── orchestration/      # Step Function to orchestrate the ETL pipeline
-├── monitoring/         # Monitoring with CloudWatch Alarms
-├── scripts/            # Python scripts for the ETL job
-├── main.tf             # Root Terraform configuration to wire modules together
-├── versions.tf         # Provider and Terraform versions
-├── locals.tf           # Defines shared variables for consistent naming and configuration.
+aws-data-devops-001-main/
+├── infra/                     # Infrastructure modules
+│   ├── s3_bucket/             # S3 bucket setup
+│   ├── glue_iam_role/         # IAM roles for Glue
+│   ├── eventbridge_s3_to_lambda/ # EventBridge rules to trigger Lambda
+│   └── lambda_trigger_step_function_etl/ # Lambda function to trigger Step Functions
+├── etl/                       # ETL pipeline components
+│   ├── glue_database/         # Glue database setup
+│   ├── glue_crawler/          # Glue crawler configuration
+│   └── glue_job/              # Glue jobs for data transformation
+├── orchestration/             # Orchestration with Step Functions
+│   └── step_function_etl/     # Step Function configuration
+├── monitoring/                # Monitoring setup using CloudWatch
+├── athena/                    # Athena SQL scripts
+│   ├── join_customers_orders.sql # Query to join customer and order data
+│   └── select_customers.sql      # Query to select customer data
+├── scripts/                   # ETL support scripts
+│   └── process_raw_to_parquet.py # Script to convert raw data to Parquet
+├── docs/                      # Documentation and diagrams
+│   └── etl-flow-diagram.png    # Visual representation of ETL flow
+├── .gitignore                 # Git ignore file
+├── terraform.tfvars           # Terraform variables
+├── variables.tf               # Terraform variable definitions
+├── versions.tf                # Terraform version constraints
+├── locals.tf                  # Terraform local variables
+├── main.tf                    # Main Terraform configuration
+├── outputs.tf                 # Terraform output definitions
+├── terraform.tf               # Terraform configuration
+└── README.md                  # Project documentation
 ```
 
 ---
