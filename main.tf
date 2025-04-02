@@ -12,18 +12,10 @@ module "s3_bucket" {
   tags        = var.tags
 }
 
-output "bucket_name" {
-  value = module.s3_bucket.bucket_name
-}
-
 module "glue_iam_role" {
   source      = "./infra/glue_iam_role"
   role_name   = local.glue_iam_role_name
   bucket_name = module.s3_bucket.bucket_name
-}
-
-output "glue_iam_role_arn" {
-  value = module.glue_iam_role.arn
 }
 
 module "lambda_trigger_step_function_etl" {
@@ -33,14 +25,6 @@ module "lambda_trigger_step_function_etl" {
   lambda_zip_file           = "./infra/lambda_trigger_step_function_etl/lambda_trigger_step_function_etl.zip"
   lambda_execution_role_arn = module.step_function_etl.role_arn
   tags                      = var.tags
-}
-
-output "lambda_name" {
-  value = module.lambda_trigger_step_function_etl.lambda_name
-}
-
-output "lambda_arn" {
-  value = module.lambda_trigger_step_function_etl.lambda_arn
 }
 
 module "eventbridge_trigger" {
@@ -62,10 +46,6 @@ module "glue_database" {
   tags          = var.tags
 }
 
-output "glue_database_name" {
-  value = module.glue_database.name
-}
-
 module "glue_crawler" {
   source         = "./etl/glue_crawler"
   crawler_name   = local.glue_crawler_name
@@ -73,12 +53,8 @@ module "glue_crawler" {
   database_name  = module.glue_database.name
   s3_target_path = local.s3_processed_path
   schedule       = null
-  depends_on     = [module.s3_bucket] # Ensures prefix exists before crawler creation
+  depends_on     = [module.s3_bucket]
   tags           = var.tags
-}
-
-output "glue_crawler_name" {
-  value = module.glue_crawler.crawler_name
 }
 
 resource "aws_s3_object" "glue_script" {
@@ -97,10 +73,6 @@ module "glue_job" {
   tags            = var.tags
 }
 
-output "glue_job_name" {
-  value = module.glue_job.job_name
-}
-
 #####################################
 # Orchestration Layer (orchestration/)
 #####################################
@@ -113,10 +85,6 @@ module "step_function_etl" {
   role_arn            = module.step_function_etl.role_arn
   s3_target_path_base = local.s3_processed_path
   tags                = var.tags
-}
-
-output "crawler_name" {
-  value = module.step_function_etl.crawler_name
 }
 
 #####################################
