@@ -1,0 +1,15 @@
+
+# Region Restriction Policy
+# Restricts resource creation to specified AWS regions.
+
+policy "region-restriction" {
+  import "tfplan/v2" as tfplan
+
+  allowed_regions = ["us-east-1", "us-west-2"]
+
+  main = rule {
+    all tfplan.resource_changes as resource {
+      resource.change.after.region in allowed_regions
+    }
+  }
+}

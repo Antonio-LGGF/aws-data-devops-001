@@ -1,0 +1,15 @@
+
+# Glue Job Resource Limits Policy
+# Restricts Glue jobs to specific worker types and memory limits.
+
+policy "glue-resource-limits" {
+  import "tfplan/v2" as tfplan
+
+  main = rule {
+    all tfplan.resource_changes as resource {
+      resource.type is "aws_glue_job" and
+      resource.change.after.max_capacity <= 10 and
+      resource.change.after.worker_type in ["Standard", "G.1X"]
+    }
+  }
+}
